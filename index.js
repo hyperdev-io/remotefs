@@ -16,22 +16,28 @@ function resolve(dir) {
   return `${baseDir}${path.resolve(dir)}`;
 };
 
+function exec(cmd, next, callback) {
+  child_process.exec(cmd, (err, out, code) => {
+    if (err) {
+      console.error(err);
+      return next(err);
+    } else {
+      callback(out, code);
+      return next();
+    }
+  });
+}
+
 function cp({body: {source, destination}}, res, next) {
   if (source && destination) {
     // path.resolve the parameters to prevent escaping from the base dir with ..
     source = resolve(source);
     destination = resolve(destination);
-    child_process.exec(`cp -rp ${source} ${destination}`, (err, out, code) => {
-      if (err) {
-        console.error(err);
-        return next(err);
-      } else {
-        res.json({
-          source: source,
-          destination: destination
-        });
-        return next();
-      }
+    exec(`cp -rp ${source} ${destination}`, next, () => {
+      res.json({
+        source: source,
+        destination: destination
+      });
     });
   } else {
     return next(new Error("Both 'source' and 'destination' are required fields"));
@@ -42,16 +48,10 @@ function du({body: {dir}}, res, next) {
   if (dir) {
     // path.resolve the parameters to prevent escaping from the base dir with ..
     dir = resolve(dir);
-    child_process.exec(`du -sb #{dir} | awk '{ print $1 }'`, (err, out, code) => {
-      if (err) {
-        console.error(err);
-        return next(err);
-      } else {
-        res.json({
-          size: parseInt(out)
-        });
-        return next();
-      }
+    exec(`du -sb ${dir} | awk '{ print $1 }'`, next, (out) => {
+      res.json({
+        size: parseInt(out)
+      });
     });
   } else {
     return next(new Error("'dir' is a required field"));

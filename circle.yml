@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   override:
-    - echo "no install"
+    - echo "no install!"
 
 test:
   override:
@@ -14,9 +14,10 @@ deployment:
   hub:
     tag: /^[0-9]+\.[0-9]+\.[0-9]+$/
     commands:
-      - docker build -t ictu/remotefs:${CIRCLE_TAG} .
-      - MAJOR_VERSION=${CIRCLE_TAG/.*}; docker tag ictu/remotefs:${CIRCLE_TAG} ictu/remotefs:${MAJOR_VERSION}
-      - MINOR_VERSION=${CIRCLE_TAG%.*}; docker tag ictu/remotefs:${CIRCLE_TAG} ictu/remotefs:${MINOR_VERSION}
+      - docker build -t remotefs .
+      - docker tag remotefs ictu/remotefs:${CIRCLE_TAG}
+      - MAJOR_VERSION=${CIRCLE_TAG/.*}; docker tag remotefs ictu/remotefs:${MAJOR_VERSION}
+      - MINOR_VERSION=${CIRCLE_TAG%.*}; docker tag remotefs ictu/remotefs:${MINOR_VERSION}
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker push ictu/remotefs:${CIRCLE_TAG}
       - docker push ictu/remotefs:${MINOR_VERSION}

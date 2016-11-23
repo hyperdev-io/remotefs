@@ -4,6 +4,7 @@ ADD . /app
 
 WORKDIR /app
 
-RUN npm i --production
+RUN apk --update --no-cache add coreutils && \
+    npm i --production
 
 CMD ["npm", "start"]

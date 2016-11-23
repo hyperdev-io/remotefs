@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  rfs:
+    image: ictu/remotefs
+    ports:
+      - "8000:80"
+    volumes:
+      - /exports/data:/exports/data
+    environment:
+      PORT: 80
+      BASE_DIR: /exports/data

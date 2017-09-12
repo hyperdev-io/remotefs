@@ -6,7 +6,8 @@ services:
     ports:
       - "8000:80"
     volumes:
-      - /exports/data:/exports/data
+      - /exports/data/acc:/data
     environment:
       PORT: 80
-      BASE_DIR: /exports/data
+      BASE_DIR: /data
+      MQTT_URL: mqtt://mqtt.dashboard.acc.ictu:1883

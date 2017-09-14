@@ -2,7 +2,7 @@
 
 const mqtt = require("mqtt");
 
-const _connect = (mqttConfig, console) => {
+const connect = mqttConfig => {
   console.log("MQTT: Connecting...", mqttConfig);
   const client = mqtt.connect(mqttConfig.url, mqttConfig);
   client.on("connect", function() {
@@ -22,7 +22,5 @@ const _connect = (mqttConfig, console) => {
 };
 
 module.exports = {
-  connect: mqttConfig => {
-    return _connect(mqttConfig, console);
-  }
+  connect
 };

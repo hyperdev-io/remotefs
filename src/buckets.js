@@ -8,7 +8,7 @@ const shell = require("shelljs");
 const listStorageBuckets = (dir, events, includeSizes) => {
   fs.readdir(dir, (err, dirList) => {
     if (err) {
-      console.error(er);
+      console.error(err);
     } else {
       const buckets = dirList
         .map(file => {

@@ -4,6 +4,7 @@ const _ = require("lodash");
 const EventEmitter2 = require("eventemitter2").EventEmitter2;
 const assert = require("assert");
 const restify = require("restify");
+const mqtt = require("bigboat-mqtt-client");
 const server = restify.createServer();
 server.use(restify.bodyParser());
 
@@ -11,22 +12,15 @@ const events = new EventEmitter2({ wildcard: true, delimiter: "/" });
 const datastore = require("./datastore");
 const buckets = require("./buckets");
 const remotefs = require("./remotefs");
-const mqtt = require("./mqtt");
 
 const port = process.env.PORT;
 const baseDir = process.env.BASE_DIR;
-const mqttConfig = {
-  url: process.env.MQTT_URL,
-  username: process.env.MQTT_USER,
-  password: process.env.MQTT_PASS
-};
 
 module.exports = () => {
   assert(port, "PORT must be defined");
   assert(baseDir, "BASE_DIR must be defined");
-  assert(mqttConfig.url, "MQTT_URL must be defined");
 
-  const mqttClient = mqtt.connect(mqttConfig);
+  const mqttClient = mqtt();
   buckets.watch({ path: baseDir }, events);
 
   const publishBucketsInfo = buckets =>

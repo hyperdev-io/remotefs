@@ -17,9 +17,9 @@ module.exports = () => {
   const port = process.env.PORT;
   const baseDir = process.env.BASE_DIR;
   const listBucketsInterval = process.env.LIST_BUCKETS_INTERVAL || 2000;
-  const getBucketSizesInterval = process.env.GET_BUCKET_SIZES_INTERVAL || 30000;
+  const getBucketSizesInterval = process.env.GET_BUCKET_SIZES_INTERVAL || 15000;
   const getDatastoreSizeInterval =
-    process.env.GET_DATASTORE_SIZE_INTERVAL || 10000;
+    process.env.GET_DATASTORE_SIZE_INTERVAL || 5000;
 
   assert(port, "PORT must be defined");
   assert(baseDir, "BASE_DIR must be defined");

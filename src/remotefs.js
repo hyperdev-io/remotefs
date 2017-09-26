@@ -28,7 +28,7 @@ function cp(baseDir) {
         `mkdir ${destination}; touch ${lockFileSrc} ${lockFileDest}`,
         err => {
           if (err) return handleError(err, next);
-          shell.exec(`cp -rp ${source} ${destination}`, err => {
+          shell.exec(`cp -rp ${source}/. ${destination}`, err => {
             if (err) return handleError(err, next);
             shell.exec(`rm ${lockFileSrc} ${lockFileDest}`, err => {
               if (err) return handleError(err, next);

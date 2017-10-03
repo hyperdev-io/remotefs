@@ -1,15 +1,13 @@
 {
   "name": "remotefs",
-  "version": "2.0.1",
+  "version": "2.0.0",
   "description": "BigBoat Storage Agent",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test":
-      "istanbul cover tests; mocha --recursive tests && istanbul report text lcov",
-    "test:html":
-      "istanbul cover tests; mocha --recursive tests && istanbul report html lcov",
+    "test": "istanbul cover tests; mocha --recursive tests && istanbul report text lcov",
+    "test:html": "istanbul cover tests; mocha --recursive tests && istanbul report html lcov",
     "test:watch": "mocha --watch-extensions test.js --watch tests ",
     "precommit": "npm test",
     "prepush": "npm test"
@@ -17,12 +15,11 @@
   "author": "ICTU",
   "license": "ISC",
   "dependencies": {
-    "bigboat-mqtt-client": "^1.0.0",
+    "@bigboat/mqtt-client": "^1.0.0",
     "chokidar": "^1.7.0",
     "eventemitter2": "^4.1.2",
     "lodash": "^4.17.4",
     "mqtt": "^2.12.0",
-    "restify": "^4.3.0",
     "shelljs": "^0.7.8"
   },
   "devDependencies": {

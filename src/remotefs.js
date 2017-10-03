@@ -12,82 +12,80 @@ function getLockFile(baseDir, bucket, op) {
   return path.join(baseDir, `.${path.parse(bucket).base}.${op}.lock`);
 }
 
-function handleError(err, next) {
-  console.error(err);
-  return next(new Error(err));
-}
-
-function cp(baseDir) {
-  return function({ body: { source, destination } }, res, next) {
+function cp(baseDir, logger) {
+  return function({ source, destination }) {
     if (source && destination) {
       source = resolve(baseDir, source);
       destination = resolve(baseDir, destination);
       const lockFileSrc = getLockFile(baseDir, source, "copy");
       const lockFileDest = getLockFile(baseDir, destination, "copy");
+      logger.log(`Copying ${source} to ${destination}`);
       shell.exec(
         `mkdir ${destination}; touch ${lockFileSrc} ${lockFileDest}`,
         err => {
-          if (err) return handleError(err, next);
+          if (err) return logger.error(err);
           shell.exec(`cp -rp ${source}/. ${destination}`, err => {
-            if (err) return handleError(err, next);
-            shell.exec(`rm ${lockFileSrc} ${lockFileDest}`, err => {
-              if (err) return handleError(err, next);
-            });
+            if (err) return logger.error(err);
+            shell.exec(`rm ${lockFileSrc} ${lockFileDest}`, logger.error);
           });
         }
       );
-      res.send("OK");
-      return next();
     } else {
-      return handleError(
-        "Both 'source' and 'destination' are required fields",
-        next
-      );
+      logger.error("Both 'source' and 'destination' are required fields");
     }
   };
 }
 
-function rm(baseDir) {
-  return function({ body: { name } }, res, next) {
+function rm(baseDir, logger) {
+  return function({ name }) {
     if (name) {
       const dir = resolve(baseDir, name);
       const lockFile = getLockFile(baseDir, name, "delete");
+      logger.log(`Deleting ${dir}`);
       shell.exec(`touch ${lockFile}`, err => {
-        if (err) return handleError(err, next);
+        if (err) return logger.error(err);
         shell.exec(`rm -rf ${dir}`, err => {
-          if (err) return handleError(err, next);
-          shell.exec(`rm ${lockFile}`, err => {
-            if (err) return handleError(err, next);
-          });
+          if (err) return logger.error(err);
+          shell.exec(`rm ${lockFile}`, logger.error);
         });
       });
-      res.send("OK");
-      return next();
     } else {
-      return handleError("'name' is a required field", next);
+      logger.error("'name' is a required field");
     }
   };
 }
 
-function mk(baseDir) {
-  return function({ body: { name } }, res, next) {
+function mk(baseDir, logger) {
+  return function({ name }) {
     if (name) {
       const dir = resolve(baseDir, name);
-      shell.exec(`mkdir ${dir}`, err => {
-        if (err) return handleError(err, next);
-        res.send("OK");
-        return next();
-      });
+      logger.log(`Creating ${dir}`);
+      shell.exec(`mkdir ${dir}`, logger.error);
     } else {
-      return handleError("'name' is a required field", next);
+      logger.error("'name' is a required field");
     }
   };
 }
 
-module.exports = function(baseDir) {
+module.exports = function(baseDir, events) {
+  function logger(action) {
+    return {
+      log: message => {
+        console.log(message);
+        events.emit("/log", { action, message });
+      },
+      error: message => {
+        if (message) {
+          console.error(message);
+          events.emit("/error", { action, message });
+        }
+      }
+    };
+  }
+
   return {
-    cp: cp(baseDir),
-    rm: rm(baseDir),
-    mk: mk(baseDir)
+    cp: cp(baseDir, logger("copy bucket")),
+    rm: rm(baseDir, logger("delete bucket")),
+    mk: mk(baseDir, logger("create bucket"))
   };
 };

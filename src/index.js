@@ -21,38 +21,32 @@ module.exports = () => {
 
   const rfs = remotefs(baseDir, events);
   const mqttClient = mqtt();
-  mqttClient.on("connect", () => {
-    buckets.watch({ path: baseDir }, events);
+  buckets.watch({ path: baseDir }, events);
 
-    const publishBucketsInfo = buckets =>
-      mqttClient.publish("/agent/storage/buckets", buckets, { retain: true });
-    const listBuckets = _.debounce(
-      buckets.list(baseDir, events, false),
-      listBucketsInterval
-    );
-    events.on("/bucket/**", listBuckets);
-    events.on("/buckets/changed", publishBucketsInfo);
+  const publishBucketsInfo = buckets =>
+    mqttClient.publish("/agent/storage/buckets", buckets, { retain: true });
+  const listBuckets = _.debounce(
+    buckets.list(baseDir, events, false),
+    listBucketsInterval
+  );
+  events.on("/bucket/**", listBuckets);
+  events.on("/buckets/changed", publishBucketsInfo);
 
-    setInterval(buckets.list(baseDir, events), getBucketSizesInterval);
-    setInterval(
-      datastore.publishDataStoreUsage(
-        mqttClient,
-        "/agent/storage/size",
-        baseDir
-      ),
-      getDatastoreSizeInterval
-    );
+  setInterval(buckets.list(baseDir, events), getBucketSizesInterval);
+  setInterval(
+    datastore.publishDataStoreUsage(mqttClient, "/agent/storage/size", baseDir),
+    getDatastoreSizeInterval
+  );
 
-    const publishMessage = (topic, msg) =>
-      mqttClient.publish(topic, msg, { retain: false });
-    events.on("/error", msg => publishMessage("/errors/remotefs", msg));
-    events.on("/log", msg => publishMessage("/logs/remotefs", msg));
+  const publishMessage = (topic, msg) =>
+    mqttClient.publish(topic, msg, { retain: false });
+  events.on("/error", msg => publishMessage("/errors/remotefs", msg));
+  events.on("/log", msg => publishMessage("/logs/remotefs", msg));
 
-    const subs = {
-      "/commands/remotefs/create": rfs.mk,
-      "/commands/remotefs/copy": rfs.cp,
-      "/commands/remotefs/delete": rfs.rm
-    };
-    mqttClient.addSubscriptions(subs, { qos: 2 });
-  });
+  const subs = {
+    "/commands/remotefs/create": rfs.mk,
+    "/commands/remotefs/copy": rfs.cp,
+    "/commands/remotefs/delete": rfs.rm
+  };
+  mqttClient.addSubscriptions(subs, { qos: 2 });
 };

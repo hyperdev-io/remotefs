@@ -2,9 +2,9 @@ version: '2'
 
 services:
   rfs:
-    image: ictu/remotefs
+    build: .
     volumes:
-      - /exports/data/acc:/data
+      - /local/data/acc:/data
     environment:
       BASE_DIR: /data
       MQTT_URL: mqtt://mqtt.dashboard.acc.ictu:1883

@@ -47,10 +47,12 @@ module.exports = () => {
       mqttClient.publish(topic, msg, { retain: false });
     events.on("/error", msg => publishMessage("/errors/remotefs", msg));
     events.on("/log", msg => publishMessage("/logs/remotefs", msg));
-    mqttClient.addSubscriptions({
+
+    const subs = {
       "/commands/remotefs/create": rfs.mk,
       "/commands/remotefs/copy": rfs.cp,
       "/commands/remotefs/delete": rfs.rm
-    });
+    };
+    mqttClient.addSubscriptions(subs, { qos: 2 });
   });
 };

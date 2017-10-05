@@ -12,6 +12,20 @@ function getLockFile(baseDir, bucket, op) {
   return path.join(baseDir, `.${path.parse(bucket).base}.${op}.lock`);
 }
 
+function handler(logger, cb) {
+  return function(code, stdout, stderr) {
+    if (code != 0) {
+      logger.error(stderr);
+    } else {
+      cb && cb(stdout);
+    }
+  };
+}
+
+function exec(cmd, logger, cb) {
+  shell.exec(cmd, handler(logger, cb));
+}
+
 function cp(baseDir, logger) {
   return function({ source, destination }) {
     if (source && destination) {
@@ -20,15 +34,13 @@ function cp(baseDir, logger) {
       const lockFileSrc = getLockFile(baseDir, source, "copy");
       const lockFileDest = getLockFile(baseDir, destination, "copy");
       logger.log(`Copying ${source} to ${destination}`);
-      shell.exec(
+      exec(
         `mkdir ${destination}; touch ${lockFileSrc} ${lockFileDest}`,
-        err => {
-          if (err) return logger.error(err);
-          shell.exec(`cp -rp ${source}/. ${destination}`, err => {
-            if (err) return logger.error(err);
-            shell.exec(`rm ${lockFileSrc} ${lockFileDest}`, logger.error);
-          });
-        }
+        logger,
+        () =>
+          exec(`cp -rp ${source}/. ${destination}`, logger, () =>
+            exec(`rm ${lockFileSrc} ${lockFileDest}`, logger)
+          )
       );
     } else {
       logger.error("Both 'source' and 'destination' are required fields");
@@ -42,13 +54,9 @@ function rm(baseDir, logger) {
       const dir = resolve(baseDir, name);
       const lockFile = getLockFile(baseDir, name, "delete");
       logger.log(`Deleting ${dir}`);
-      shell.exec(`touch ${lockFile}`, err => {
-        if (err) return logger.error(err);
-        shell.exec(`rm -rf ${dir}`, err => {
-          if (err) return logger.error(err);
-          shell.exec(`rm ${lockFile}`, logger.error);
-        });
-      });
+      exec(`touch ${lockFile}`, logger, () =>
+        exec(`rm -rf ${dir}`, logger, () => exec(`rm ${lockFile}`, logger))
+      );
     } else {
       logger.error("'name' is a required field");
     }
@@ -60,7 +68,7 @@ function mk(baseDir, logger) {
     if (name) {
       const dir = resolve(baseDir, name);
       logger.log(`Creating ${dir}`);
-      shell.exec(`mkdir ${dir}`, logger.error);
+      exec(`mkdir ${dir}`, logger);
     } else {
       logger.error("'name' is a required field");
     }

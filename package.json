@@ -15,7 +15,7 @@
   "author": "ICTU",
   "license": "ISC",
   "dependencies": {
-    "@bigboat/mqtt-client": "^1.0.0",
+    "@bigboat/mqtt-client": "^1.1.0",
     "chokidar": "^1.7.0",
     "eventemitter2": "^4.1.2",
     "lodash": "^4.17.4",

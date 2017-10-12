@@ -16,8 +16,9 @@
   "license": "ISC",
   "dependencies": {
     "@bigboat/mqtt-client": "^1.1.0",
-    "chokidar": "^1.7.0",
+    "diskusage": "^0.2.4",
     "eventemitter2": "^4.1.2",
+    "get-folder-size": "^1.0.0",
     "lodash": "^4.17.4",
     "mqtt": "^2.12.0",
     "shelljs": "^0.7.8"

@@ -2,10 +2,9 @@
 
 const path = require("path");
 const fs = require("fs");
-const chokidar = require("chokidar");
-const shell = require("shelljs");
+const getSize = require("get-folder-size");
 
-const listStorageBuckets = (dir, events, includeSizes) => {
+const listStorageBuckets = (dir, events) => {
   fs.readdir(dir, (err, dirList) => {
     if (err) {
       console.error(err);
@@ -23,45 +22,44 @@ const listStorageBuckets = (dir, events, includeSizes) => {
                 dirList.indexOf(copyLock) >= 0 ||
                 dirList.indexOf(deleteLock) >= 0
             };
-            if (includeSizes) {
-              bucket.size = parseInt(
-                shell.exec(
-                  `du -sb ${path.join(dir, file)} | awk '{ print $1 }'`,
-                  { silent: true }
-                )
-              );
-            }
             return bucket;
           }
         })
         .filter(b => b);
-      events.emit("/buckets/changed", buckets);
+      events.emit("/buckets", buckets);
+    }
+  });
+};
+
+const listBucketSizes = (dir, events) => {
+  fs.readdir(dir, (err, dirList) => {
+    if (err) {
+      console.error(err);
+    } else {
+      const buckets = dirList.map(name => {
+        const folder = path.join(dir, name);
+        const stat = fs.statSync(folder);
+        if (stat.isDirectory()) {
+          getSize(folder, function(err, size) {
+            if (err) {
+              events.emit("/error", {
+                action: "get size",
+                message: err.message
+              });
+            } else {
+              events.emit("/size", {
+                name,
+                size
+              });
+            }
+          });
+        }
+      });
     }
   });
 };
 
 module.exports = {
-  list: (baseDir, events, includeSizes = true) => {
-    return bucket => {
-      return listStorageBuckets(baseDir, events, includeSizes);
-    };
-  },
-  watch: (config, events) => {
-    function emit(eventType) {
-      return function(file) {
-        events.emit(eventType, { name: path.parse(file).base });
-      };
-    }
-    const watchOpts = { ignored: path.join(config.path, "/*/**") };
-    const watchDir = chokidar.watch(config.path, watchOpts);
-    watchDir.on("addDir", emit("/bucket/added"));
-    watchDir.on("unlinkDir", emit("/bucket/removed"));
-
-    const watchLockFiles = chokidar.watch(
-      path.join(config.path, "/.*.lock"),
-      watchOpts
-    );
-    watchLockFiles.on("add", emit("/bucket/lock/added"));
-    watchLockFiles.on("unlink", emit("/bucket/lock/removed"));
-  }
+  list: (baseDir, events) => bucket => listStorageBuckets(baseDir, events),
+  listSizes: (baseDir, events) => bucket => listBucketSizes(baseDir, events)
 };

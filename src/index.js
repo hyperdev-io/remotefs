@@ -12,9 +12,9 @@ const remotefs = require("./remotefs");
 
 const addCommandSubscriptions = (mqtt, rfs) => {
   const subs = {
-    "/commands/remotefs/create": rfs.mk,
-    "/commands/remotefs/copy": rfs.cp,
-    "/commands/remotefs/delete": rfs.rm
+    "/commands/storage/bucket/create": rfs.mk,
+    "/commands/storage/bucket/copy": rfs.cp,
+    "/commands/storage/bucket/delete": rfs.rm
   };
   mqtt.addSubscriptions(subs, { qos: 2 });
 };
@@ -22,8 +22,8 @@ const addCommandSubscriptions = (mqtt, rfs) => {
 const addLogging = mqtt => {
   const publishMessage = (topic, msg) =>
     mqtt.publish(topic, msg, { retain: false });
-  events.on("/error", msg => publishMessage("/errors/remotefs", msg));
-  events.on("/log", msg => publishMessage("/logs/remotefs", msg));
+  events.on("/error", msg => publishMessage("/errors/storage", msg));
+  events.on("/log", msg => publishMessage("/logs/storage", msg));
 };
 
 const watchBuckets = (baseDir, listBucketsInterval, mqtt, events) => {
@@ -35,7 +35,7 @@ const watchBuckets = (baseDir, listBucketsInterval, mqtt, events) => {
 
 const watchBucketSizes = (baseDir, getBucketSizesInterval, mqtt, events) => {
   events.on("/size", data => mqtt.publish("/agent/storage/bucket/size", data));
-  setInterval(buckets.listSizes(baseDir, events), getBucketSizesInterval);
+  buckets.listSizes(baseDir, events, getBucketSizesInterval);
 };
 
 module.exports = () => {

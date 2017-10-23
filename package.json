@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@bigboat/mqtt-client": "^1.1.0",
+    "async": "^2.5.0",
     "diskusage": "^0.2.4",
     "eventemitter2": "^4.1.2",
     "get-folder-size": "^1.0.0",

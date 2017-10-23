@@ -16,7 +16,11 @@ const addCommandSubscriptions = (mqtt, rfs) => {
     "/commands/storage/bucket/copy": rfs.cp,
     "/commands/storage/bucket/delete": rfs.rm
   };
-  mqtt.addSubscriptions(subs, { qos: 2 });
+  mqtt.subscribe("/commands/storage/#", { qos: 2 });
+  mqtt.on(
+    "message",
+    (topic, msg) => subs[topic] && subs[topic](JSON.parse(msg))
+  );
 };
 
 const addLogging = mqtt => {

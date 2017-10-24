@@ -1,16 +1,32 @@
 {
   "name": "remotefs",
-  "version": "1.1.0",
-  "description": "",
-  "main": "index.coffee",
+  "version": "2.0.0",
+  "description": "BigBoat Storage Agent",
+  "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "istanbul cover tests; mocha --recursive tests && istanbul report text lcov",
+    "test:html": "istanbul cover tests; mocha --recursive tests && istanbul report html lcov",
+    "test:watch": "mocha --watch-extensions test.js --watch tests ",
+    "precommit": "npm test",
+    "prepush": "npm test"
   },
-  "author": "",
+  "author": "ICTU",
   "license": "ISC",
   "dependencies": {
-    "restify": "^4.3.0"
+    "@bigboat/mqtt-client": "^1.1.0",
+    "async": "^2.5.0",
+    "diskusage": "^0.2.4",
+    "eventemitter2": "^4.1.2",
+    "get-folder-size": "^1.0.0",
+    "lodash": "^4.17.4",
+    "mqtt": "^2.12.0",
+    "shelljs": "^0.7.8"
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.5",
+    "mocha": "^3.5.3",
+    "testdouble": "^3.2.5"
   }
 }

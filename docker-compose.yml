@@ -2,11 +2,9 @@ version: '2'
 
 services:
   rfs:
-    image: ictu/remotefs
-    ports:
-      - "8000:80"
+    build: .
     volumes:
-      - /exports/data:/exports/data
+      - /local/data/acc:/data
     environment:
-      PORT: 80
-      BASE_DIR: /exports/data
+      BASE_DIR: /data
+      MQTT_URL: mqtt://mqtt.dashboard.acc.ictu:1883

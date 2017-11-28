@@ -5,7 +5,7 @@ module.exports = {
     return function() {
       df(dir, (err, info) => {
         const total = info.total;
-        const used = total - info.free;
+        const used = total - info.available;
         const percentage = Math.round(used / total * 100);
         if (err) {
           mqtt.publish(
@@ -21,7 +21,7 @@ module.exports = {
             name: dir,
             total,
             used,
-            free: info.free,
+            free: info.available,
             percentage: `${percentage}%`
           });
         }

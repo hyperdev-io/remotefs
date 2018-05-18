@@ -1,7 +1,7 @@
 # Architecture
 
 ## Purpose
-The RemoteFS service allows bucket comand (create, copy, delete) to be executed local to the data. Secondly it reports the size of the storage disk and the size of each bucket.
+The RemoteFS service allows bucket commands (create, copy, delete) to be executed local to the data. Secondly it reports the size of the storage disk and the size of each bucket.
 
 Design rationale: In the BigBoat Architecture the same NFS directory is mounted on each node. Thus, it would be possible to execute the same file commands on all nodes. 
 However, in practice, copying and deleting folders on NFS can take a considerable amount of time if the folder contains a lot of data or small files.

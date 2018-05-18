@@ -10,3 +10,7 @@ speed.
 docker run -d --name remotefs -e PORT=80 -e BASE_DIR=/data -v /local/data/test-proj:/data MQTT_URL=mqtt://localhost:1883 \
   -p 8000:80 ictu/remotefs
 ```
+
+# Architecture
+
+See [Docs](./docs)

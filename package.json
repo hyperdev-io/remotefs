@@ -4,6 +4,7 @@
   "description": "BigBoat Storage Agent",
   "main": "index.js",
   "scripts": {
+    "mermaid": "for i in ./docs/*.mmd; do mmdc -i $i -o $i.png -t neutral; done",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "istanbul cover tests; mocha --recursive tests && istanbul report text lcov",
@@ -25,6 +26,7 @@
     "shelljs": "^0.7.8"
   },
   "devDependencies": {
+    "mermaid.cli": "^0.4.6",
     "istanbul": "^0.4.5",
     "mocha": "^3.5.3",
     "testdouble": "^3.2.5"

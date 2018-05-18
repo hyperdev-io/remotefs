@@ -1,0 +1,10 @@
+graph LR
+    subgraph 
+        Dashboard --- MQTT
+    end
+    subgraph nfs-machine
+        MQTT --> id1(RemoteFS)
+        id1(RemoteFS) --> MQTT
+    end
+
+    style id1 fill:white,stroke:green,stroke-width:4px

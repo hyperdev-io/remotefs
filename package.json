@@ -29,6 +29,7 @@
     "mermaid.cli": "^0.4.6",
     "istanbul": "^0.4.5",
     "mocha": "^3.5.3",
+    "nodemon": "^1.17.5",
     "testdouble": "^3.2.5"
   }
 }

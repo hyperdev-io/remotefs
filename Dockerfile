@@ -7,4 +7,5 @@ WORKDIR /app
 RUN apk --update --no-cache add coreutils python make g++ && \
     npm i --production
 
-CMD ["npm", "start"]
+EXPOSE 9228
+ENTRYPOINT npm run dev

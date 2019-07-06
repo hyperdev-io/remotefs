@@ -6,7 +6,7 @@
   "scripts": {
     "mermaid": "for i in ./docs/*.mmd; do mmdc -i $i -o $i.png -t neutral; done",
     "start": "node index.js",
-    "dev": "nodemon index.js",
+    "dev": "nodemon --inspect=0.0.0.0:9228 index.js",
     "test": "istanbul cover tests; mocha --recursive tests && istanbul report text lcov",
     "test:html": "istanbul cover tests; mocha --recursive tests && istanbul report html lcov",
     "test:watch": "mocha --watch-extensions test.js --watch tests ",
